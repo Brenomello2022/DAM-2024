@@ -1,10 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../model/tarefa.dart';
 
 class ConteudoFormDialog extends StatefulWidget{
-
-  final Tarefa? tarefaAtual;
+      final Tarefa? tarefaAtual;
 
   ConteudoFormDialog({ Key? key, this.tarefaAtual}) : super(key: key);
 
@@ -40,25 +41,23 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog>{
               decoration: InputDecoration(labelText: 'Descrição'),
               validator: (String? valor){
                 if (valor == null || valor.isEmpty){
-                  return 'Informe a descrição';
+                  return 'Informe a descrição!';
                 }
                 return null;
               },
-
             ),
-
             TextFormField(
               controller: prazoController,
               decoration: InputDecoration(
                   labelText: 'Prazo',
-                  prefixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: _mostraCalendario,
-                  ),
+                prefixIcon: IconButton(
+                  icon: Icon(Icons.calendar_today),
+                  onPressed: _mostraCalendario,
+                ),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.clear),
-                  onPressed: () => prazoController.clear()
-                )
+                  onPressed: () => prazoController.clear(),
+                ),
               ),
               readOnly: true,
             )
@@ -70,9 +69,9 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog>{
 
   void _mostraCalendario() {
     final dataFormatada = prazoController.text;
-    var data =  DateTime.now();
+    var data = DateTime.now();
 
-    if (dataFormatada.isNotEmpty){
+    if(dataFormatada.isNotEmpty){
       data = _prazoFormatado.parse(dataFormatada);
     }
     showDatePicker(
@@ -97,5 +96,4 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog>{
       prazo: prazoController.text.isEmpty ? null :
       _prazoFormatado.parse(prazoController.text),
   );
-
 }

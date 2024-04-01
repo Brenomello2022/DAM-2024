@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerenciador_tareas/pages/filtro_page.dart';
 import 'package:gerenciador_tarefas/pages/lista_page_tarefas.dart';
 
 void main() {
@@ -15,11 +16,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Gerenciador Tarefas',
       theme: ThemeData(
-
+        primarySwatch: Colors.red,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
       home: ListaTarefaPage(),
+      routes: {
+        FiltroPage.ROUTE_NAME: (BuildContext context) => FiltroPage(),
+      }
     );
   }
 }

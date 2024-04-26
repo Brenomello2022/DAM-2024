@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gerenciador_tareas/model/tarefa.dart';
 import 'package:gerenciador_tareas/pages/filtro_page.dart';
 import 'package:gerenciador_tareas/widgets/conteudo_form_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gerenciador_tarefas/dao/tarefa_dao.dart';
 
 class ListaTarefaPage extends StatefulWidget{
 
@@ -12,10 +14,45 @@ class ListaTarefaPage extends StatefulWidget{
 class _ListaTarefaPageState extends State<ListaTarefaPage>{
 
   final _tarefas = <Tarefa> [];
-  var _ultimoId = 0;
+  final _dao = TarefaDao();
+
+  var _carregando = false;
 
   static const ACAO_EDITAR = 'editar';
   static const ACAO_EXCLUIR = 'excluir';
+
+  @override
+  void initState(){
+    super.initState();
+    _atualizarLista();
+  }
+
+  void _atualizarLista () async{
+
+    setState(() {
+      _carregando = true;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+
+    final _campoOrdenacao = prefs.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? Tarefa.campo_id;
+    final _usarOrdemDecrescente = prefs.getBool(FiltroPage.CHAVE_ORDENAR_DECRESCENTE) == true;
+    final _filtroDescricao = prefs.getString(FiltroPage.CHAVE_FILTRO_DESCRICAO) ?? '';
+
+    final tarefas = await _dao.Lista(
+      filtro: _filtroDescricao,
+      campoOrdenacao: _campoOrdenacao,
+      usarOrdemDecrescente: _usarOrdemDecrescente,
+    );
+
+    setState(() {
+      _tarefas.clear();
+      if(tarefas.isNotEmpty){
+        _carregando = false;
+        _tarefas.addAll(tarefas);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context){
@@ -24,8 +61,8 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
       body: _criarBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _abrirForm,
-        child: Icon(Icons.add),
         tooltip: 'Nova Tarefa',
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -45,8 +82,32 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
   }
 
   Widget _criarBody(){
+    if (_carregando){
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Align(
+            alignment: AlignmentDirectional.center,
+            child: CircularProgressIndicator(),
+          ),
+          Align(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Text('Carregando suas tarefas',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              )
+              ),
+            )
+          ),
+        ],
+      );
+    }
+
     if(_tarefas.isEmpty){
-      return  const Center(
+      return const Center(
         child: Text('Tudo certo por aqui!!!',
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
@@ -57,9 +118,27 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
           final tarefa = _tarefas[index];
           return PopupMenuButton<String>(
             child: ListTile(
-              title: Text('${tarefa.id} - ${tarefa.descricao}'),
+              leading: Checkbox(
+                value: tarefa.finalizada,
+                onChanged: (bool? check){
+                  setState(() {
+                    tarefa.finalizada = check == true;
+                  });
+                  _dao.salvar(tarefa);
+                },
+              ),
+              title: Text('${tarefa.id} - ${tarefa.descricao}',
+              style: TextStyle(
+                decoration: tarefa.finalizada ? TextDecoration.lineThrough : null,
+                color: tarefa.finalizada ? Colors.grey : null,
+              ),),
               subtitle: Text(tarefa.prazoFormatado == '' ? 'Sem prazo definido' :
-              'Prazo - ${tarefa.prazoFormatado}'),
+              'Prazo - ${tarefa.prazoFormatado}',
+                style: TextStyle(
+                  decoration: tarefa.finalizada ? TextDecoration.lineThrough : null,
+                  color: tarefa.finalizada ? Colors.grey : null,
+                ),
+              ),
             ),
               itemBuilder: (BuildContext context) => criarItensMenuPopUp(),
             onSelected: (String valorSelecionado){
@@ -80,7 +159,7 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
     final navigator = Navigator.of(context);
     navigator.pushNamed(FiltroPage.ROUTE_NAME).then((alterouValor) {
       if(alterouValor == true){
-
+        _atualizarLista();
       }
     });
   }
@@ -170,12 +249,9 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
                     key.currentState != null){
                       setState(() {
                         final novaTarefa = key.currentState!.novaTarefa;
-                        if( indice == null){
-                          novaTarefa.id = ++ _ultimoId;
-                          _tarefas.add(novaTarefa);
-                        }else{
-                          _tarefas[indice] = novaTarefa;
-                        }
+                        _dao.salvar(novaTarefa).then((success) {
+                          _atualizarLista();
+                        });
                       });
                       Navigator.of(context).pop();
                     }

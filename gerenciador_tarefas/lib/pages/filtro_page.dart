@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gerenciador_tareas/model/tarefa.dart';
+import 'package:gerenciador_tarefas/model/tarefa.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FiltroPage extends StatefulWidget{
 
   static const ROUTE_NAME = '/filtro';
-  static const  CHAVE_CAMPO_ORDENACAO = 'campoOrdenacao';
-  static const  CHAVE_ORDENAR_DECRESCENTE = 'usarOrdemDecrescente';
-  static const  CHAVE_FILTRO_DESCRICAO = 'filtroDescricao';
+  static const CHAVE_CAMPO_ORDENACAO = 'campoOrdenacao';
+  static const CHAVE_ORDENAR_DECRESCENTE = 'usarOrdemDecrescente';
+  static const CHAVE_FILTRO_DESCRICAO = 'filtroDescricao';
 
   @override
   _FiltroPageState createState() => _FiltroPageState();
@@ -46,7 +46,7 @@ class _FiltroPageState extends State<FiltroPage>{
   @override
   Widget build(BuildContext context){
     return WillPopScope(
-        onWillPop: null,
+        onWillPop: _onVoltarClick,
         child: Scaffold(
           appBar: AppBar(
             centerTitle: false,
@@ -76,7 +76,7 @@ class _FiltroPageState extends State<FiltroPage>{
               Text(camposParaOrdenacao[campo] ?? ''),
             ],
           ),
-        Divider(),
+        const Divider(),
         Row(
           children: [
             Checkbox(
@@ -86,7 +86,7 @@ class _FiltroPageState extends State<FiltroPage>{
             Text('Usar ordem descrescente')
           ],
         ),
-         Divider(),
+         const Divider(),
            Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
           child: TextField(

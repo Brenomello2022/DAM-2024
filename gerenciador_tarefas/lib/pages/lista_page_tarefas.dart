@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gerenciador_tareas/model/tarefa.dart';
-import 'package:gerenciador_tareas/pages/filtro_page.dart';
-import 'package:gerenciador_tareas/widgets/conteudo_form_dialog.dart';
+import 'package:gerenciador_tarefas/model/tarefa.dart';
+import 'package:gerenciador_tarefas/pages/detalhe_tarefa_page.dart';
+import 'package:gerenciador_tarefas/pages/filtro_page.dart';
+import 'package:gerenciador_tarefas/widgets/conteudo_form_dialogo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gerenciador_tarefas/dao/tarefa_dao.dart';
 
@@ -20,6 +21,7 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
 
   static const ACAO_EDITAR = 'editar';
   static const ACAO_EXCLUIR = 'excluir';
+  static const ACAO_VISUALIZAR = 'visualizar';
 
   @override
   void initState(){
@@ -62,7 +64,7 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
       floatingActionButton: FloatingActionButton(
         onPressed: _abrirForm,
         tooltip: 'Nova Tarefa',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -70,7 +72,7 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
   AppBar _criarAppBar(BuildContext context){
     return AppBar(
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      title: Text('Tarefas'),
+      title: const Text('Tarefas'),
       centerTitle: false,
       actions: [
         IconButton(
@@ -107,7 +109,7 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
     }
 
     if(_tarefas.isEmpty){
-      return const Center(
+      return  const Center(
         child: Text('Tudo certo por aqui!!!',
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
@@ -143,9 +145,12 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
               itemBuilder: (BuildContext context) => criarItensMenuPopUp(),
             onSelected: (String valorSelecionado){
               if (valorSelecionado == ACAO_EDITAR){
-                _abrirForm(tarefaAtual: tarefa, indice: index);
+                _abrirForm(tarefaAtual: tarefa);
+              }else if (valorSelecionado == ACAO_EXCLUIR){
+                _excluir(tarefa.id);
               }else{
-                _excluir(index);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => DetalheTarefaPage(tarefa: tarefa)));
               }
             },
           );
@@ -159,14 +164,26 @@ class _ListaTarefaPageState extends State<ListaTarefaPage>{
     final navigator = Navigator.of(context);
     navigator.pushNamed(FiltroPage.ROUTE_NAME).then((alterouValor) {
       if(alterouValor == true){
-        _atualizarLista();
+          _atualizarLista();
       }
     });
   }
 
   List<PopupMenuEntry<String>> criarItensMenuPopUp(){
     return [
-       const PopupMenuItem(
+      const PopupMenuItem(
+          value: ACAO_VISUALIZAR,
+          child: Row(
+            children: [
+              Icon(Icons.info, color: Colors.blue),
+              Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('Visualizar'),
+              )
+            ],
+          )
+      ),
+      const PopupMenuItem(
         value: ACAO_EDITAR,
           child: Row(
             children: [

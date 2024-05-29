@@ -42,5 +42,4 @@ class _MapasPageState extends State<MapasPage>{
       ),
     );
   }
-
 }

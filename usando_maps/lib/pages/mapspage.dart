@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:usando_maps/pages/mapa_page.dart';
 
 class HomePage extends StatefulWidget{
 

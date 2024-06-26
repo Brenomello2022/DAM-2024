@@ -4,11 +4,9 @@ Este projeto foi criado baseado na Play Store, tem três páginas: página de fi
 
 Projeto finalizado - Avaliação Segundo Bimestre - Desenvolvimento de Aplicativos Móveis.
 
-===================================================================================================================================================
+## Getting Started
 
 A new Flutter project.
-
-## Getting Started
 
 This project is a starting point for a Flutter application.
 

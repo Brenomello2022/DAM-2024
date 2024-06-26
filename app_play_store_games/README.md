@@ -1,4 +1,4 @@
-# app_play_store_games
+# Play Store Games Mobile.
 
 Este projeto foi criado baseado na Play Store, tem três páginas: página de filtros, página de jogos e a página inicial. O projeto também conta com um modelo, para puxar os dados. Este projeto também usa banco de dados, e a regra DAO Objeto de acesso a dados (acrônimo do inglês Data Access Object - DAO), é um padrão para aplicações que utilizam persistência de dados, onde tem a separação das regras de negócio das regras de acesso a banco de dados. E o projeto também usa GPS, buscando a localização por latitude e longitude. 
 
